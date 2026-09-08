@@ -51,3 +51,54 @@ income_tx |>
     legend.text = element_text(size = 8)
   )
 ```
+
+```{r}
+#| message: false
+#| cache: true
+edu_state <- get_acs(
+  geography = "state",
+  year = 2020,
+  variables = c(
+    "B15003_022",
+    "B15003_023",
+    "B15003_024",
+    "B15003_025"
+  ),
+  summary_var = "B15003_001",
+  output = "wide"
+)
+```
+
+```{r}
+edu_state |>
+  mutate(
+    bachelors_or_higher = B15003_022E + B15003_023E + B15003_024E + B15003_025E,
+    pct_bachelors = bachelors_or_higher / summary_est * 100
+  ) |>
+  arrange(desc(pct_bachelors)) |>
+  ggplot(aes(x = reorder(NAME, pct_bachelors), y = pct_bachelors)) +
+  geom_col(width = 0.8, fill = "steelblue", color = "white") +
+  coord_flip() +
+  scale_y_continuous(
+    labels = scales::label_percent(scale = 1),
+    expand = expansion(mult = c(0, 0.05))
+  ) +
+  labs(
+    title = "Distribution of Adult Education Attainment by State",
+    subtitle = "Percent of adults with at least a bachelor’s degree",
+    x = "State",
+    y = "Percent of adults with a bachelor’s degree or higher",
+    caption = "Source: U.S. Census Bureau, 2016-2020 ACS 5-year estimates"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    plot.title = element_text(face = "bold", hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5),
+    axis.title.x = element_text(face = "bold"),
+    axis.title.y = element_text(face = "bold"),
+    plot.caption = element_text(hjust = 0.5, size = 9),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.text.y = element_text(size = 5)
+  )
+```
