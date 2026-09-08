@@ -1,0 +1,53 @@
+---
+title: "Analyzing US Census Data"
+author: "GitHub Copilot"
+execute:
+  echo: false
+---
+
+```{r}
+#| message: false
+library(tidyverse)
+library(tidycensus)
+library(sf)
+```
+
+```{r}
+#| message: false
+income_tx <- get_acs(
+  geography = "county",
+  state = "TX",
+  year = 2020,
+  variables = "B19013_001",
+  geometry = TRUE,
+  output = "wide"
+)
+```
+
+```{r}
+#| message: false
+income_tx |>
+  ggplot(aes(fill = B19013_001E)) +
+  geom_sf(color = "white", linewidth = 0.1) +
+  scale_fill_viridis_c(
+    option = "viridis",
+    name = "Median household income (2020 dollars)",
+    guide = guide_colorbar(title.position = "top")
+  ) +
+  labs(
+    title = "Median Household Income by Texas County",
+    caption = "Source: U.S. Census Bureau, 2016-2020 ACS 5-year estimates"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.line = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    axis.title = element_blank(),
+    panel.grid = element_blank(),
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    legend.position = "right",
+    legend.title = element_text(size = 10),
+    legend.text = element_text(size = 8)
+  )
+```
