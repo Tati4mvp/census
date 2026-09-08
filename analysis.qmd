@@ -102,3 +102,53 @@ edu_state |>
     axis.text.y = element_text(size = 5)
   )
 ```
+
+```{r}
+#| message: false
+age_ca <- get_acs(
+  geography = "county",
+  state = "CA",
+  year = 2020,
+  variables = c(
+    median_age = "B01002_001",
+    population = "B01003_001"
+  ),
+  geometry = FALSE,
+  output = "wide"
+)
+```
+
+```{r}
+age_ca |>
+  rename(
+    median_age = median_ageE,
+    population = populationE
+  ) |>
+  ggplot(aes(x = median_age, y = population)) +
+  geom_point(alpha = 0.75, color = "steelblue") +
+  geom_text(
+    data = age_ca |>
+      rename(median_age = median_ageE, population = populationE) |>
+      arrange(desc(population)) |>
+      slice_head(n = 4),
+    aes(label = NAME),
+    hjust = -0.10,
+    vjust = 0.40,
+    size = 3
+  ) +
+  scale_y_log10() +
+  labs(
+    title = "California County Population vs. Median Age",
+    x = "Median age (years)",
+    y = "Population (log scale)",
+    caption = "Source: U.S. Census Bureau, 2016-2020 ACS 5-year estimates"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    plot.title = element_text(face = "bold", hjust = 0.5),
+    axis.title.x = element_text(face = "bold"),
+    axis.title.y = element_text(face = "bold"),
+    plot.caption = element_text(hjust = 0.5, size = 9),
+    panel.grid.minor = element_blank()
+  )
+```
